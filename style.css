@@ -170,7 +170,7 @@ popover.menu contents {
   .idle-widget.idle-active {
     color: cyan; }
   .idle-widget .text {
-    font-size: 15pt; }
+    margin-top: 8px; }
 
 .material-slider {
   all: unset;

@@ -250,8 +250,11 @@ popover.menu {
         //     background-color: lighten($bg, 10%);
         // }
     }
+
     .text {
-        font-size: 15pt;
+        margin-top: 8px;
+        // font-size: 20pt;
+        // color: cyan;
     }
 }
 .material-slider {

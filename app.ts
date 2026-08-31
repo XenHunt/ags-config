@@ -4,9 +4,9 @@ import OSDWindows from "./widget/OSD"
 import { showOSD } from "./service/osd"
 import { initBrightnessWatcher } from "./service/brightness"
 import { setLedState } from "./service/keyboard-leds"
-import { execAsync } from "ags/process"
+import { execAsync, exec } from "ags/process"
+import { monitorFile } from "ags/file"
 import GLib from "gi://GLib"
-import { startScssWatcher, getCompiledCssPath } from "./service/scss-watcher"
 
 app.start({
   icons: `${SRC}/icons`, // SRC will point to the root
@@ -31,7 +31,6 @@ app.start({
   },
   main() {
     initBrightnessWatcher()
-    startScssWatcher()
 
     execAsync([
       "python3",
@@ -43,5 +42,23 @@ app.start({
     }
     // Создаём все OSD окна
     OSDWindows()
+    // Обновление стилей
+    monitorFile(
+      // directory that contains the scss files
+      `${SRC}/style.scss`,
+
+      function () {
+        // main scss file
+        const scss = `${SRC}/style.scss`
+
+        // target css file
+        const css = `/tmp/my-style.css`
+
+        // compile, reset, apply
+        exec(`sassc ${scss} ${css}`)
+        app.reset_css()
+        app.apply_css(css)
+      },
+    )
   },
 })
