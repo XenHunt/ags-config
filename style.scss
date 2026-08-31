@@ -1,0 +1,325 @@
+* {
+    all: unset;
+    font-weight: bold;
+    font-size: 12pt;
+    // color: white;
+    // font-family: 'Courier New', Courier, monospace;
+    // font-family: "Courier New", Courier, monospace;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+$bg: #282a38;
+// $bg: red;
+// $bg-light: #261d1e;
+// $bg-light: red;
+$fg: #ffffff;
+$active: #8d70b5;
+$unactive: #ffffff;
+// $unactive: red;
+$bat-f-color: mix(#ffffff, black, 30%);
+.workspace,
+.tray,
+.clock,
+.battery-box {
+    padding: 2px;
+}
+
+.tray {
+    padding-right: 15px;
+}
+
+.calendar,
+.bar {
+    padding: 0.4rem 1rem;
+    background-color: $bg;
+    border-radius: 2rem 2rem 2rem 2rem;
+    margin-top: -10pt;
+    margin-left: -2pt;
+    margin-right: -2pt;
+    padding-top: 10pt;
+    color: $fg;
+}
+
+.middle-separator {
+    background-color: gray;
+    padding: 0 0.03rem;
+}
+
+.layout {
+    font-size: 10pt;
+}
+
+.workspace {
+    border-radius: 1rem;
+    padding: 0 0.55rem;
+    transition: 0.3s;
+}
+
+.workspace:hover {
+    background-color: lighten($bg, 10%);
+    color: darken($fg, 10%);
+}
+
+.workspace.active {
+    background-color: $active;
+    color: $bg;
+}
+
+.tray-item {
+    // all: unset;
+    color: $fg;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 2px 6px;
+    border-radius: 2rem;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &:active {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    // Сбрасываем стили только для внутренней иконки/текста, не для самой кнопки
+    image,
+    label {
+        color: $fg;
+    }
+}
+.monospace {
+    font-family:
+        "JetBrains Mono", "Fira Code", "Cascadia Code", "Courier New", monospace;
+    font-size: 12pt;
+}
+// .clock {
+//     // font-size: 1.1rem;
+//     // margin-right: 0.5rem;
+// }
+
+popover.menu {
+    contents {
+        background-color: $bg;
+        padding: 0.35rem;
+        border-radius: 1rem;
+        modelbutton {
+            transition: 0.3s;
+            border-radius: 0.5rem;
+            padding: 0.25rem 1rem;
+        }
+        modelbutton:hover {
+            background-color: mix($bg, $unactive, 80%);
+        }
+        separator {
+            background-color: mix($bg, $unactive, 90%);
+            min-height: 0.1rem;
+            margin: 0.5rem 0;
+        }
+
+        label:disabled {
+            color: $unactive;
+        }
+
+        arrow {
+            opacity: 0.3;
+
+            &:hover {
+                background: none;
+            }
+
+            &.left {
+                -gtk-icon-source: -gtk-icontheme("go-previous-symbolic");
+            }
+
+            &.right {
+                -gtk-icon-source: -gtk-icontheme("go-next-symbolic");
+            }
+        }
+    }
+}
+
+@keyframes alert-animation-icon {
+    0%,
+    100% {
+        background-color: $bg;
+    }
+    50% {
+        background-color: mix($bg, red, 0.5);
+    }
+}
+
+@keyframes alert-animation-label {
+    0%,
+    100% {
+        color: $bat-f-color;
+    }
+    50% {
+        color: mix($bg, red, 0.5);
+    }
+}
+
+.battery-box {
+    // color: green;
+    margin-left: -20px;
+    transition: color 0.3s ease;
+    .battery-label.normal {
+        color: $bat-f-color;
+        // color: white;
+        font-size: 9pt;
+        margin-right: 5px;
+        // .normal {
+        //     color: green;
+        //     font-size: 100pt;
+        // }
+    }
+    .battery-icon {
+        // background-color: red;
+        color: white;
+    }
+
+    // .battery-icon.normal {
+    //     color: white;
+    // }
+    .battery-label.critical {
+        animation: alert-animation-label 2s ease-in-out infinite;
+    }
+
+    .battery-icon.critical {
+        animation: alert-animation-icon 2s ease-in-out infinite;
+    }
+}
+.osd {
+    background-color: transparentize($bg, 0.35);
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+    padding: 10px;
+    .icon {
+        font-size: 25pt;
+        margin-right: 5px;
+        &.active {
+            color: white;
+        }
+        &.inactive {
+            color: grey;
+        }
+    }
+    .text {
+        font-size: 15pt;
+    }
+}
+
+.backlight-container {
+    .backlight-icon {
+        transition: color 0.3s ease;
+        color: $fg;
+    }
+    .backlight-icon.active {
+        color: cyan;
+        border-radius: 1rem;
+    }
+    &:hover {
+        background-color: lighten($bg, 10%);
+    }
+}
+.backlight-container,
+.output-container,
+.input-container,
+.clock,
+.layout,
+.power-menu,
+.idle-widget,
+.tray-item {
+    border-radius: 2rem;
+    transition: 0.3s;
+    // min-width: 20px;
+    // color: $fg;
+    padding: 2px;
+    &:hover {
+        background-color: lighten($bg, 10);
+    }
+}
+
+.idle-widget {
+    padding-left: 5px;
+    padding-right: 5px;
+    &.idle-active {
+        color: cyan;
+        // &:hover {
+        //     background-color: lighten($bg, 10%);
+        // }
+    }
+    .text {
+        font-size: 15pt;
+    }
+}
+.material-slider {
+    all: unset;
+    margin: 0.85rem 0;
+    min-width: 200px;
+    background-color: gray;
+    min-height: 0.3rem;
+    border-radius: 1rem;
+
+    * {
+        all: unset;
+    }
+    highlight {
+        background-color: $active;
+
+        border-radius: 1rem 0 0 1rem;
+    }
+
+    slider {
+        background-color: $active;
+        // margin: 5px;
+        border-radius: 1rem;
+
+        min-height: 25px;
+        min-width: 25px;
+    }
+}
+// .volume-slider trough {
+//     min-width: 100px;
+//     background-color: gray;
+//     min-height: 0.3rem;
+//     border-radius: 1rem;
+
+//     highlight {
+//         background-color: $active;
+//     }
+
+//     slider {
+//         background-color: $fg;
+//         min-height: 10px;
+//         min-width: 20px;
+//         margin: -8px;
+//         border-radius: 1rem;
+//     }
+// }
+.cpu-gpu-box {
+    padding-top: 2px;
+    .critical {
+        animation: alert-animation-label 2s ease-in-out infinite;
+    }
+}
+tooltip {
+    background-color: $bg;
+    color: $fg;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    // Сбрасываем прозрачность для всех дочерних элементов
+    * {
+        background-color: transparent;
+        color: $fg;
+    }
+
+    // Для календаря внутри тултипа
+    calendar {
+        background-color: $bg;
+        color: $fg;
+    }
+}
