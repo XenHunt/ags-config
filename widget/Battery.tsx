@@ -49,14 +49,13 @@ export default function BatteryWidget() {
 
   return (
     <box cssClasses={["battery-box"]} spacing={2}>
+      <image cssClasses={iconClasses} iconName={iconName} pixelSize={35} />
       <label
         cssClasses={labelClasses}
         label={labelText}
         visible={charging((c) => !c) as any}
         xalign={1}
       />
-
-      <image cssClasses={iconClasses} iconName={iconName} pixelSize={28} />
     </box>
   )
 }

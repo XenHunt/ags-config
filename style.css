@@ -99,7 +99,7 @@ popover.menu contents {
 @keyframes alert-animation-label {
   0%,
   100% {
-    color: #4d4d4d; }
+    color: #e6e6e6; }
   50% {
     color: #fe0000; } }
 
@@ -107,8 +107,8 @@ popover.menu contents {
   margin-left: -20px;
   transition: color 0.3s ease; }
   .battery-box .battery-label.normal {
-    color: #4d4d4d;
-    font-size: 9pt;
+    color: #e6e6e6;
+    font-size: 12pt;
     margin-right: 5px; }
   .battery-box .battery-icon {
     color: white; }
@@ -207,3 +207,7 @@ tooltip {
   tooltip calendar {
     background-color: #282a38;
     color: #ffffff; }
+
+.power-menu .power-box {
+  background-color: #282a38;
+  border-radius: 0.5rem; }

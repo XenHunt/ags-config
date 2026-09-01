@@ -1,17 +1,15 @@
 import app from "ags/gtk4/app"
-import { Astal, Gtk, Gdk } from "ags/gtk4"
+import { Astal, Gdk } from "ags/gtk4"
 import { createBinding, For } from "ags"
 import { execAsync } from "ags/process"
 import Hyprland from "gi://AstalHyprland"
 import Mpris from "gi://AstalMpris"
-
 import BatteryWidget from "./Battery"
 import TrayWidget from "./Tray"
 import ClockWidget from "./Clock"
 import IdleWidget from "./Idle"
 import KeyboardLayoutWidget from "./KeyboardLayout"
 import MemoryWidget from "./Memory"
-import PowerMenu from "./PowerMenu"
 import CpuGpuWidget from "./CpuGpu"
 import VolumeControler from "./Volume"
 import BacklightWidget from "./Backlight"
@@ -33,14 +31,14 @@ function MediaPlayer({ player }: { player: any }) {
 export default function Bar(gdkmonitor: Gdk.Monitor) {
   const hyprland = Hyprland.get_default()
   const mpris = Mpris.get_default()
-
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
 
   // --- Workspaces ---
+  // Фильтруем только обычные рабочие столы (id > 0), исключаем special workspace
   const sortedWorkspaces = createBinding(
     hyprland,
     "workspaces",
-  )((ws) => [...ws].sort((a, b) => a.id - b.id))
+  )((ws) => [...ws].filter((w) => w.id > 0).sort((a, b) => a.id - b.id))
 
   const Workspaces = () => (
     <box cssClasses={["workspaces"]} spacing={5}>
@@ -56,7 +54,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
             onClicked={() =>
               execAsync(
                 `hyprctl dispatch 'hl.dsp.focus({ workspace = "${ws.id}" })'`,
-              )
+              ).catch(console.error)
             }
           >
             <label label={`${ws.id}`} width_chars={2} />

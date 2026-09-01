@@ -6,7 +6,11 @@ export default function PowerMenu() {
     <menubutton cssClasses={["power-menu"]}>
       <image iconName="system-shutdown-symbolic" pixelSize={20} />
       <popover>
-        <box orientation={Gtk.Orientation.VERTICAL} spacing={5}>
+        <box
+          orientation={Gtk.Orientation.VERTICAL}
+          spacing={5}
+          cssClasses={["power-box"]}
+        >
           <button
             cssClasses={["menu-item"]}
             onClicked={() => execAsync("swaylock").catch(console.error)}

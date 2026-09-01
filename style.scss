@@ -16,7 +16,7 @@ $fg: #ffffff;
 $active: #8d70b5;
 $unactive: #ffffff;
 // $unactive: red;
-$bat-f-color: mix(#ffffff, black, 30%);
+$bat-f-color: mix(#ffffff, black, 90%);
 .workspace,
 .tray,
 .clock,
@@ -167,7 +167,7 @@ popover.menu {
     .battery-label.normal {
         color: $bat-f-color;
         // color: white;
-        font-size: 9pt;
+        font-size: 12pt;
         margin-right: 5px;
         // .normal {
         //     color: green;
@@ -324,5 +324,12 @@ tooltip {
     calendar {
         background-color: $bg;
         color: $fg;
+    }
+}
+
+.power-menu {
+    .power-box {
+        background-color: $bg;
+        border-radius: 0.5rem;
     }
 }
