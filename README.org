@@ -1,0 +1,260 @@
+#+TITLE: AGS Bar for Hyprland
+#+AUTHOR: XenHunt
+#+DATE: 2026
+#+DESCRIPTION: A minimal, reactive status bar built with AGS v3 and Astal libraries for Hyprland Wayland compositor.
+
+* AGS Bar for Hyprland
+
+A minimal, reactive status bar built with [[https://github.com/Aylur/ags][AGS v3]] (Aylur's GTK Shell) and [[https://github.com/Aylur/astal][Astal]] libraries, designed specifically for the [[https://hyprland.org/][Hyprland]] Wayland compositor.
+
+Originally ported from my [[https://github.com/linkarzu/ignis][Ignis]] configuration, this project takes full advantage of AGS's reactive JSX syntax and Astal's event-driven architecture.
+
+* ✨ Features
+
+** Bar Components
+- *Workspaces*: sorted, clickable, with active state highlighting
+- *Client Title*: shows the focused window title
+- *CPU/GPU Monitor*: live usage and temperatures with critical threshold alerts
+- *Memory*: RAM and Swap usage
+- *Keyboard Layout*: current layout indicator (RU 🇷🇺 / EN 🇺🇸) with click-to-switch
+- *Volume*: output/input levels with dynamic icons and mute state
+- *Backlight*: brightness level with hyprshade toggle
+- *Idle Inhibitor*: visual indicator and toggle for systemd-inhibit
+- *Clock*: multiple formats on click, with Gtk.Calendar popover
+- *System Tray*: full DBusMenu support with proper action groups
+- *Battery*: UPower integration with percentage and charging state
+- Power Menu: I disabled as I don't really use it as I have keybindings for everything I nedd
+
+** OSD System
+Event-driven On-Screen Display for:
+- Audio output changes
+- Audio input changes
+- Brightness changes
+- CapsLock / NumLock / ScrollLock state changes
+
+Features a *mutual exclusion* system — only one OSD is visible at a time, with automatic 3-second auto-hide and timer reset on subsequent triggers.
+
+** Reactive Architecture
+- *Event-driven*: no polling where possible (AstalWp for audio, AstalBattery for battery, AstalHyprland events for layouts, /sys/class/leds for keyboard LEDs)
+- *Fallback polling*: smart polling with =Gio.FileMonitor= as backup for sysfs values
+- *SCSS hot-reload*: automatic recompilation on save via =sassc=
+- *IPC integration*: control OSD from Hyprland keybindings via =ags request -i my-bar=
+
+* 📦 Dependencies
+
+** Core
++ [[https://github.com/Aylur/ags][ags]] (v3+) — GTK4 shell framework
++ libastal-4-git 
++ libastal-apps-git 
++ libastal-auth-git 
++ libastal-battery-git 
++ libastal-bluetooth-git 
++ libastal-cava-git 
++ libastal-git 
++ libastal-gjs-git 
++ libastal-greetd-git 
++ libastal-hyprland-git 
++ libastal-io-git 
++ libastal-meta 1-8.1
++ libastal-mpris-git 
++ libastal-network-git 
++ libastal-notifd-git 
++ libastal-powerprofiles-git 
++ libastal-river-git 
++ libastal-tray-git 
++ libastal-wireplumber-git 
++ nvidia/nvidia-smi
+
+** System Tools
+- =hyprland= — Wayland compositor
+- =wireplumber= — audio session manager
+- =sassc= — SCSS compiler (for hot-reload)
+- =jq= — JSON parsing (keyboard layout)
+- =brightnessctl= — backlight control
+- =lm_sensors= — CPU temperature
+- =nvidia-utils= — GPU monitoring (NVIDIA only)
+- =python-libevdev= — keyboard LED monitoring
+
+* 🚀 Installation
+
+** 1. Clone the repository
+#+begin_src bash
+git clone https://github.com/berlizoves/ags-bar ~/.config/ags
+cd ~/.config/ags
+#+end_src
+
+** 2. Install dependencies (Arch Linux)
+#+begin_src bash
+# Core
+yay -S ags libastal libastal-battery libastal-hyprland \
+       libastal-wireplumber libastal-tray libastal-mpris
+
+# System tools
+sudo pacman -S sassc jq brightnessctl lm_sensors python-libevdev
+
+#+end_src
+
+** 3. Setup permissions for keyboard LED monitoring
+#+begin_src bash
+sudo usermod -a -G input $USER
+# Log out and log back in for this to take effect
+#+end_src
+
+** 4. Copy scripts
+#+begin_src bash
+chmod +x ~/.config/ags/scripts/*.sh
+chmod +x ~/.config/ags/scripts/*.py
+#+end_src
+
+** 5. Configure Hyprland keybindings
+Add to your =hyprland.conf=:
+#+begin_src lua
+hl.bind(
+	"XF86AudioRaiseVolume",
+	hl.dsp.exec_cmd(
+		"wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+ ; ags request -i my-bar showOSD audio-output 2>/dev/null"
+	),
+	{ repeating = true, locked = true }
+)
+hl.bind(
+	"XF86AudioLowerVolume",
+	hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-; ags request -i my-bar showOSD audio-output 2>/dev/null"),
+	{ repeating = true, locked = true }
+)
+hl.bind(
+	"ALT + XF86AudioRaiseVolume",
+	hl.dsp.exec_cmd(
+		"wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 1%+; ags request -i my-bar showOSD audio-input 2>/dev/null"
+	),
+	{ repeating = true, locked = true }
+)
+hl.bind(
+	"ALT + XF86AudioLowerVolume",
+	hl.dsp.exec_cmd(
+		"wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 1%-; ags request -i my-bar showOSD audio-input 2>/dev/null"
+	),
+	{ repeating = true, locked = true }
+)
+hl.bind(
+	"XF86AudioMute",
+	hl.dsp.exec_cmd(
+		"wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; ags request -i my-bar showOSD audio-output 2>/dev/null"
+	),
+	{ locked = true }
+)
+hl.bind(
+	"XF86AudioMicMute",
+	hl.dsp.exec_cmd(
+		"wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle; ags request -i my-bar showOSD audio-input 2>/dev/null"
+	),
+	{ locked = true }
+)
+
+
+hl.bind(
+	"XF86MonBrightnessDown",
+	hl.dsp.exec_cmd("ags request -i my-bar showOSD brightness 2>/dev/null ; brightnessctl s 1%-"),
+	{ repeating = true, locked = true }
+)
+hl.bind(
+	"XF86MonBrightnessUp",
+	hl.dsp.exec_cmd("ags request -i my-bar showOSD brightness 2>/dev/null ; brightnessctl s 1%+"),
+	{ repeating = true, locked = true }
+)
+#+end_src
+
+** 6. Run
+#+begin_src bash
+ags run --gtk 4
+#+end_src
+
+* 📁 Project Structure
+
+#+begin_src
+.
+├── app.ts
+├── env.d.ts
+├── icons
+│   └── hicolor
+│       └── scalable
+│           └── actions
+│               ├── audio-volume-high-symbolic.svg
+│               ├── audio-volume-low-symbolic.svg
+│               ├── audio-volume-medium-symbolic.svg
+│               ├── audio-volume-muted-symbolic.svg
+│               ├── display-fill-symbolic.svg
+│               ├── microphone-slash-symbolic.svg
+│               └── microphone-symbolic.svg
+├── LICENSE
+├── package.json
+├── README.org
+├── scripts
+│   ├── idle.sh
+│   └── keyboard-leds-monitor.py
+├── service
+│   ├── brightness.ts
+│   ├── keyboard-leds.ts
+│   └── osd.ts
+├── style.css
+├── style.scss
+├── tsconfig.json
+└── widget
+    ├── Backlight.tsx
+    ├── Bar.tsx
+    ├── Battery.tsx
+    ├── Clock.tsx
+    ├── CpuGpu.tsx
+    ├── Idle.tsx
+    ├── KeyboardLayout.tsx
+    ├── Memory.tsx
+    ├── OSD.tsx
+    ├── PowerMenu.tsx
+    ├── Tray.tsx
+    └── Volume.tsx
+#+end_src
+
+* 🎨 Customization
+
+** Styling
+Edit =style.scss= — changes are applied automatically on save.
+
+SCSS variables you can tweak:
+#+begin_src scss
+$bg: #1e1e2e;
+$fg: #cdd6f4;
+$active: #89b4fa;
+#+end_src
+
+** Adding widgets
+All widgets are in =widget/= directory. To add a new one:
+1. Create =widget/MyWidget.tsx=
+2. Import it in =widget/Bar.tsx=
+3. Add to the desired section (start / center / end)
+
+** IPC Commands
+Control the bar from CLI:
+#+begin_src bash
+# Show specific OSD
+ags request -i my-bar showOSD audio-output
+ags request -i my-bar showOSD brightness
+ags request -i my-bar showOSD capslock
+
+# Update keyboard LED state (used by Python monitor)
+ags request -i my-bar led capslock on
+#+end_src
+
+* 🙏 Acknowledgments
+
+- *[[https://github.com/Aylur][Aylur]]* — for creating AGS and Astal, the backbone of this project
+- *[[https://github.com/ignis-sh/ignis][Ignis]]* — the original framework this config was ported from
+- *[[https://hyprland.org/][Hyprland]]* community — for the best Wayland compositor
+
+* 📄 License
+
+This project is licensed under the MIT License — see the [[./LICENSE][LICENSE]] file for details.
+
+You are free to use, modify, and distribute this configuration. Just keep the attribution.
+
+---
+
+Made with ❤️ and way too much coffee/energy drinks ☕
