@@ -10,6 +10,7 @@
 :END:
 :CONTENTS:
 - [[#варианты-readme][Варианты README]]
+- [[#скриншоты][Скриншоты]]
 - [[#ags-bar-для-hyprland][AGS Bar для Hyprland]]
 - [[#-возможности][✨ Возможности]]
   - [[#компоненты-бара][Компоненты бара]]
@@ -40,6 +41,20 @@
 :END:
 + [[./README.org][EN]]
 + RU (этот)
+
+* Скриншоты
+:PROPERTIES:
+:CUSTOM_ID: скриншоты
+:END:
+
+#+DOWNLOADED: screenshot @ 2026-09-13 19:42:26
+#+CAPTION: Простой пример
+[[file:images/Screenshots/2026-09-13_19-42-25_screenshot.png]]
+
+
+#+DOWNLOADED: screenshot @ 2026-09-13 19:43:22
+#+CAPTION: Пример OSD
+[[file:images/Screenshots/2026-09-13_19-43-22_screenshot.png]]
 
 * AGS Bar для Hyprland
 :PROPERTIES:

@@ -9,6 +9,7 @@
 :END:
 :CONTENTS:
 - [[#lang][Lang]]
+- [[#screenshots][Screenshots]]
 - [[#ags-bar-for-hyprland][AGS Bar for Hyprland]]
 - [[#-features][✨ Features]]
   - [[#bar-components][Bar Components]]
@@ -39,6 +40,23 @@
 :END:
 + ENG (this)
 + [[./README_RU.org][RU]]
+
+* Screenshots
+:PROPERTIES:
+:ID:       1cfd33b9-776c-44b5-8832-5cabab109f23
+:CUSTOM_ID: screenshots
+:END:
+
+#+DOWNLOADED: screenshot @ 2026-09-13 19:42:26
+#+CAPTION: Simple example
+[[file:images/Screenshots/2026-09-13_19-42-25_screenshot.png]]
+
+
+#+DOWNLOADED: screenshot @ 2026-09-13 19:43:22
+#+CAPTION: OSD Example
+[[file:images/Screenshots/2026-09-13_19-43-22_screenshot.png]]
+
+
 
 * AGS Bar for Hyprland
 :PROPERTIES:
