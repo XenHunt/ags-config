@@ -1,0 +1,337 @@
+#+TITLE: AGS Bar для Hyprland
+#+AUTHOR: XenHunt
+#+DATE: 2026
+#+DESCRIPTION: Минималистичный реактивный статус-бар, созданный с помощью AGS v3 и библиотек Astal для Wayland-композитора Hyprland.
+#+LANGUAGE: ru
+
+* Содержание
+:PROPERTIES:
+:TOC:      :include all :depth 10 :force (depth) :ignore (this) :local (depth)
+:END:
+:CONTENTS:
+- [[#ags-bar-для-hyprland][AGS Bar для Hyprland]]
+- [[#-возможности][✨ Возможности]]
+  - [[#компоненты-бара][Компоненты бара]]
+  - [[#система-osd][Система OSD]]
+  - [[#реактивная-архитектура][Реактивная архитектура]]
+- [[#-зависимости][📦 Зависимости]]
+  - [[#основные][Основные]]
+  - [[#системные-инструменты][Системные инструменты]]
+- [[#-установка][🚀 Установка]]
+  - [[#1-клонируйте-репозиторий][1. Клонируйте репозиторий]]
+  - [[#2-установите-зависимости-arch-linux][2. Установите зависимости (Arch Linux)]]
+  - [[#3-настройте-права-для-мониторинга-led-клавиатуры][3. Настройте права для мониторинга LED клавиатуры]]
+  - [[#4-сделайте-скрипты-исполняемыми][4. Сделайте скрипты исполняемыми]]
+  - [[#5-настройте-клавиатурные-сокращения-hyprland][5. Настройте клавиатурные сокращения Hyprland]]
+  - [[#6-запустите][6. Запустите]]
+- [[#-структура-проекта][📁 Структура проекта]]
+- [[#-настройка][🎨 Настройка]]
+  - [[#стилизация][Стилизация]]
+  - [[#добавление-виджетов][Добавление виджетов]]
+  - [[#команды-ipc][Команды IPC]]
+- [[#-благодарности][🙏 Благодарности]]
+- [[#-лицензия][📄 Лицензия]]
+:END:
+
+* AGS Bar для Hyprland
+:PROPERTIES:
+:CUSTOM_ID: ags-bar-для-hyprland
+:END:
+
+Минималистичный реактивный статус-бар, созданный с помощью [[https://github.com/Aylur/ags][AGS v3]] (Aylur's GTK Shell) и библиотек [[https://github.com/Aylur/astal][Astal]], разработанный специально для Wayland-композитора [[https://hyprland.org/][Hyprland]].
+
+Изначально портирован из моей конфигурации [[https://github.com/linkarzu/ignis][Ignis]], этот проект полностью использует преимущества реактивного JSX-синтаксиса AGS и событийно-ориентированной архитектуры Astal.
+
+* ✨ Возможности
+:PROPERTIES:
+:CUSTOM_ID: -возможности
+:END:
+
+** Компоненты бара
+:PROPERTIES:
+:CUSTOM_ID: компоненты-бара
+:END:
+- *Рабочие пространства*: отсортированные, кликабельные, с подсветкой активного состояния
+- *Заголовок клиента*: показывает название сфокусированного окна
+- *Медиаплеер*: интеграция MPRIS с обложкой и элементами управления
+- *Монитор CPU/GPU*: загрузка и температуры в реальном времени с предупреждениями о критических порогах
+- *Память*: использование RAM и Swap
+- *Раскладка клавиатуры*: индикатор текущей раскладки (RU 🇷🇺 / EN 🇺🇸) с переключением по клику
+- *Громкость*: уровни вывода/ввода с динамическими иконками и состоянием отключения звука
+- *Подсветка*: уровень яркости с переключением hyprshade
+- *Блокировщик простоя*: визуальный индикатор и переключатель для systemd-inhibit
+- *Часы*: несколько форматов по клику, с выпадающим Gtk.Calendar
+- *Системный трей*: полная поддержка DBusMenu с правильными группами действий
+- *Батарея*: интеграция UPower с процентом заряда и состоянием зарядки
+- *Меню питания*: блокировка, сон, гибернация, перезагрузка, выключение, выход
+
+** Система OSD
+:PROPERTIES:
+:CUSTOM_ID: система-osd
+:END:
+Событийно-ориентированные экранные уведомления для:
+- Изменений громкости вывода
+- Изменений громкости ввода
+- Изменений яркости
+- Изменений состояния CapsLock / NumLock / ScrollLock
+
+Особенности:
+- *Система взаимного исключения* — одновременно видно только одно OSD
+- Автоматическое скрытие через 3 секунды
+- Сброс таймера при последующих срабатываниях
+
+** Реактивная архитектура
+:PROPERTIES:
+:CUSTOM_ID: реактивная-архитектура
+:END:
+- *Событийно-ориентированная*: без опроса там, где это возможно (AstalWp для аудио, AstalBattery для батареи, события AstalHyprland для раскладок, libevdev для LED клавиатуры)
+- *Запасной опрос*: умный опрос с =monitorFile= в качестве резервного варианта для значений sysfs
+- *Горячая перезагрузка SCSS*: автоматическая перекомпиляция при сохранении через =sassc=
+- *Интеграция IPC*: управление OSD из клавиатурных сокращений Hyprland через =ags -i my-bar -r=
+
+* 📦 Зависимости
+:PROPERTIES:
+:CUSTOM_ID: -зависимости
+:END:
+
+** Основные
+:PROPERTIES:
+:CUSTOM_ID: основные
+:END:
+- [[https://github.com/Aylur/ags][ags]] (v3+) — фреймворк для GTK4 shell
+- [[https://aylur.github.io/astal/][libastal]] — основная библиотека
+- [[https://aylur.github.io/astal/][libastal-battery]] — интеграция с UPower для батареи
+- [[https://aylur.github.io/astal/][libastal-hyprland]] — IPC с Hyprland
+- [[https://aylur.github.io/astal/][libastal-wireplumber]] — управление аудио через WirePlumber
+- [[https://aylur.github.io/astal/][libastal-tray]] — системный трей (StatusNotifier)
+- [[https://aylur.github.io/astal/][libastal-mpris]] — интеграция с медиаплеерами MPRIS
+- [[https://aylur.github.io/astal/][libastal-powerprofiles]] — профили питания (опционально)
+
+** Системные инструменты
+:PROPERTIES:
+:CUSTOM_ID: системные-инструменты
+:END:
+- =hyprland= — Wayland-композитор
+- =wireplumber= — менеджер аудио-сессий
+- =sassc= — компилятор SCSS (для горячей перезагрузки)
+- =jq= — парсинг JSON (раскладка клавиатуры)
+- =brightnessctl= — управление подсветкой
+- =lm_sensors= — температура CPU
+- =nvidia-utils= — мониторинг GPU (только NVIDIA)
+- =python-libevdev= — мониторинг LED клавиатуры
+- =hyprshade= — переключение шейдеров экрана (опционально)
+
+* 🚀 Установка
+:PROPERTIES:
+:CUSTOM_ID: -установка
+:END:
+
+** 1. Клонируйте репозиторий
+:PROPERTIES:
+:CUSTOM_ID: 1-клонируйте-репозиторий
+:END:
+#+BEGIN_SRC bash
+git clone https://github.com/XenHunt/ags-config ~/.config/ags
+cd ~/.config/ags
+#+END_SRC
+
+** 2. Установите зависимости (Arch Linux)
+:PROPERTIES:
+:CUSTOM_ID: 2-установите-зависимости-arch-linux
+:END:
+#+BEGIN_SRC bash
+# Основные
+yay -S ags libastal libastal-battery libastal-hyprland \
+       libastal-wireplumber libastal-tray libastal-mpris
+
+# Системные инструменты
+sudo pacman -S sassc jq brightnessctl lm_sensors python-libevdev
+
+# Опционально
+yay -S hyprshade
+#+END_SRC
+
+** 3. Настройте права для мониторинга LED клавиатуры
+:PROPERTIES:
+:CUSTOM_ID: 3-настройте-права-для-мониторинга-led-клавиатуры
+:END:
+#+BEGIN_SRC bash
+sudo usermod -a -G input $USER
+# Выйдите и войдите снова, чтобы изменения вступили в силу
+#+END_SRC
+
+** 4. Сделайте скрипты исполняемыми
+:PROPERTIES:
+:CUSTOM_ID: 4-сделайте-скрипты-исполняемыми
+:END:
+#+BEGIN_SRC bash
+chmod +x ~/.config/ags/scripts/*.sh
+chmod +x ~/.config/ags/scripts/*.py
+#+END_SRC
+
+** 5. Настройте клавиатурные сокращения Hyprland
+:PROPERTIES:
+:CUSTOM_ID: 5-настройте-клавиатурные-сокращения-hyprland
+:END:
+Добавьте в ваш =hyprland.conf=:
+#+BEGIN_SRC lua
+hl.bind(
+	"XF86AudioRaiseVolume",
+	hl.dsp.exec_cmd(
+		"wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+ ; ags request -i my-bar showOSD audio-output 2>/dev/null"
+	),
+	{ repeating = true, locked = true }
+)
+hl.bind(
+	"XF86AudioLowerVolume",
+	hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-; ags request -i my-bar showOSD audio-output 2>/dev/null"),
+	{ repeating = true, locked = true }
+)
+hl.bind(
+	"ALT + XF86AudioRaiseVolume",
+	hl.dsp.exec_cmd(
+		"wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 1%+; ags request -i my-bar showOSD audio-input 2>/dev/null"
+	),
+	{ repeating = true, locked = true }
+)
+hl.bind(
+	"ALT + XF86AudioLowerVolume",
+	hl.dsp.exec_cmd(
+		"wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 1%-; ags request -i my-bar showOSD audio-input 2>/dev/null"
+	),
+	{ repeating = true, locked = true }
+)
+hl.bind(
+	"XF86AudioMute",
+	hl.dsp.exec_cmd(
+		"wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; ags request -i my-bar showOSD audio-output 2>/dev/null"
+	),
+	{ locked = true }
+)
+hl.bind(
+	"XF86AudioMicMute",
+	hl.dsp.exec_cmd(
+		"wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle; ags request -i my-bar showOSD audio-input 2>/dev/null"
+	),
+	{ locked = true }
+)
+
+
+hl.bind(
+	"XF86MonBrightnessDown",
+	hl.dsp.exec_cmd("ags request -i my-bar showOSD brightness 2>/dev/null ; brightnessctl s 1%-"),
+	{ repeating = true, locked = true }
+)
+hl.bind(
+	"XF86MonBrightnessUp",
+	hl.dsp.exec_cmd("ags request -i my-bar showOSD brightness 2>/dev/null ; brightnessctl s 1%+"),
+	{ repeating = true, locked = true }
+)
+
+#+END_SRC
+
+** 6. Запустите
+:PROPERTIES:
+:CUSTOM_ID: 6-запустите
+:END:
+#+BEGIN_SRC bash
+ags run --gtk 4
+#+END_SRC
+
+* 📁 Структура проекта
+:PROPERTIES:
+:CUSTOM_ID: -структура-проекта
+:END:
+
+#+BEGIN_SRC
+.
+├── app.ts                   # Основная точка входа приложения
+├── style.scss               # Основной файл SCSS (горячая перезагрузка)
+├── scripts/
+│   ├── idle.sh              # Переключатель блокировки простоя
+│   ├── show-osd.sh          # Триггер OSD для CLI
+│   ├── show-keyboard-osd.sh # Триггер OSD клавиатуры
+│   └── keyboard-leds-monitor.py  # Монитор LED через libevdev
+├── widget/
+│   ├── Bar.tsx              # Основной макет бара
+│   ├── Battery.tsx
+│   ├── Backlight.tsx
+│   ├── Clock.tsx
+│   ├── CpuGpu.tsx
+│   ├── Idle.tsx
+│   ├── KeyboardLayout.tsx
+│   ├── Memory.tsx
+│   ├── OSD.tsx              # Все окна OSD
+│   ├── PowerMenu.tsx
+│   ├── Tray.tsx
+│   └── Volume.tsx
+└── service/
+    ├── brightness.ts        # Состояние подсветки + FileMonitor
+    ├── keyboard-leds.ts     # Управление состоянием LED
+    ├── osd.ts               # Контроллер видимости OSD
+    └── scss-watcher.ts      # Горячая перезагрузка SCSS
+#+END_SRC
+
+* 🎨 Настройка
+:PROPERTIES:
+:CUSTOM_ID: -настройка
+:END:
+
+** Стилизация
+:PROPERTIES:
+:CUSTOM_ID: стилизация
+:END:
+Редактируйте =style.scss= — изменения применяются автоматически при сохранении.
+
+Переменные SCSS, которые можно настроить:
+#+BEGIN_SRC scss
+$bg: #1e1e2e;
+$fg: #cdd6f4;
+$active: #89b4fa;
+#+END_SRC
+
+** Добавление виджетов
+:PROPERTIES:
+:CUSTOM_ID: добавление-виджетов
+:END:
+Все виджеты находятся в директории =widget/=. Чтобы добавить новый:
+1. Создайте =widget/MyWidget.tsx=
+2. Импортируйте его в =widget/Bar.tsx=
+3. Добавьте в нужную секцию (start / center / end)
+
+** Команды IPC
+:PROPERTIES:
+:CUSTOM_ID: команды-ipc
+:END:
+Управление баром из командной строки:
+#+BEGIN_SRC bash
+# Показать конкретное OSD
+ags request -i my-bar showOSD audio-output
+ags request -i my-bar showOSD brightness
+ags request -i my-bar showOSD capslock
+
+# Обновить состояние LED клавиатуры (используется Python-монитором)
+ags request -i my-bar led capslock on
+#+END_SRC
+
+* 🙏 Благодарности
+:PROPERTIES:
+:CUSTOM_ID: -благодарности
+:END:
+
+- *[[https://github.com/Aylur][Aylur]]* — за создание AGS и Astal, основы этого проекта
+- *[[https://ignis.readthedocs.io/][Ignis]]* — оригинальный фреймворк, из которого была портирована эта конфигурация
+- Сообщество *[[https://hyprland.org/][Hyprland]]* — за лучший Wayland-композитор
+
+* 📄 Лицензия
+:PROPERTIES:
+:CUSTOM_ID: -лицензия
+:END:
+
+Этот проект лицензирован под лицензией MIT — подробности см. в файле [[./LICENSE][LICENSE]].
+
+Вы свободны использовать, модифицировать и распространять эту конфигурацию. Просто сохраните упоминание автора.
+
+---
+
+Сделано с ❤️ и слишком большим количеством кофе ☕
