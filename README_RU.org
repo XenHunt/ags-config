@@ -9,6 +9,7 @@
 :TOC:      :include all :depth 10 :force (depth) :ignore (this) :local (depth)
 :END:
 :CONTENTS:
+- [[#варианты-readme][Варианты README]]
 - [[#ags-bar-для-hyprland][AGS Bar для Hyprland]]
 - [[#-возможности][✨ Возможности]]
   - [[#компоненты-бара][Компоненты бара]]
@@ -32,6 +33,13 @@
 - [[#-благодарности][🙏 Благодарности]]
 - [[#-лицензия][📄 Лицензия]]
 :END:
+
+* Варианты README
+:PROPERTIES:
+:CUSTOM_ID: варианты-readme
+:END:
++ [[./README.org][EN]]
++ RU (этот)
 
 * AGS Bar для Hyprland
 :PROPERTIES:

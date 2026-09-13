@@ -3,15 +3,61 @@
 #+DATE: 2026
 #+DESCRIPTION: A minimal, reactive status bar built with AGS v3 and Astal libraries for Hyprland Wayland compositor.
 
+* TOC
+:PROPERTIES:
+:TOC:      :include all :depth 10 :force (depth) :ignore (this) :local (depth)
+:END:
+:CONTENTS:
+- [[#lang][Lang]]
+- [[#ags-bar-for-hyprland][AGS Bar for Hyprland]]
+- [[#-features][✨ Features]]
+  - [[#bar-components][Bar Components]]
+  - [[#osd-system][OSD System]]
+  - [[#reactive-architecture][Reactive Architecture]]
+- [[#-dependencies][📦 Dependencies]]
+  - [[#core][Core]]
+  - [[#system-tools][System Tools]]
+- [[#-installation][🚀 Installation]]
+  - [[#1-clone-the-repository][1. Clone the repository]]
+  - [[#2-install-dependencies-arch-linux][2. Install dependencies (Arch Linux)]]
+  - [[#3-setup-permissions-for-keyboard-led-monitoring][3. Setup permissions for keyboard LED monitoring]]
+  - [[#4-copy-scripts][4. Copy scripts]]
+  - [[#5-configure-hyprland-keybindings][5. Configure Hyprland keybindings]]
+  - [[#6-run][6. Run]]
+- [[#-project-structure][📁 Project Structure]]
+- [[#-customization][🎨 Customization]]
+  - [[#styling][Styling]]
+  - [[#adding-widgets][Adding widgets]]
+  - [[#ipc-commands][IPC Commands]]
+- [[#-acknowledgments][🙏 Acknowledgments]]
+- [[#-license][📄 License]]
+:END:
+
+* Lang
+:PROPERTIES:
+:CUSTOM_ID: lang
+:END:
++ ENG (this)
++ [[./README_RU.org][RU]]
+
 * AGS Bar for Hyprland
+:PROPERTIES:
+:CUSTOM_ID: ags-bar-for-hyprland
+:END:
 
 A minimal, reactive status bar built with [[https://github.com/Aylur/ags][AGS v3]] (Aylur's GTK Shell) and [[https://github.com/Aylur/astal][Astal]] libraries, designed specifically for the [[https://hyprland.org/][Hyprland]] Wayland compositor.
 
 Originally ported from my [[https://github.com/linkarzu/ignis][Ignis]] configuration, this project takes full advantage of AGS's reactive JSX syntax and Astal's event-driven architecture.
 
 * ✨ Features
+:PROPERTIES:
+:CUSTOM_ID: -features
+:END:
 
 ** Bar Components
+:PROPERTIES:
+:CUSTOM_ID: bar-components
+:END:
 - *Workspaces*: sorted, clickable, with active state highlighting
 - *Client Title*: shows the focused window title
 - *CPU/GPU Monitor*: live usage and temperatures with critical threshold alerts
@@ -26,6 +72,9 @@ Originally ported from my [[https://github.com/linkarzu/ignis][Ignis]] configura
 - Power Menu: I disabled as I don't really use it as I have keybindings for everything I nedd
 
 ** OSD System
+:PROPERTIES:
+:CUSTOM_ID: osd-system
+:END:
 Event-driven On-Screen Display for:
 - Audio output changes
 - Audio input changes
@@ -35,14 +84,23 @@ Event-driven On-Screen Display for:
 Features a *mutual exclusion* system — only one OSD is visible at a time, with automatic 3-second auto-hide and timer reset on subsequent triggers.
 
 ** Reactive Architecture
+:PROPERTIES:
+:CUSTOM_ID: reactive-architecture
+:END:
 - *Event-driven*: no polling where possible (AstalWp for audio, AstalBattery for battery, AstalHyprland events for layouts, /sys/class/leds for keyboard LEDs)
-- *Fallback polling*: smart polling with =Gio.FileMonitor= as backup for sysfs values
+- *Fallback polling*: smart polling with =monitorFile= as backup for sysfs values
 - *SCSS hot-reload*: automatic recompilation on save via =sassc=
 - *IPC integration*: control OSD from Hyprland keybindings via =ags request -i my-bar=
 
 * 📦 Dependencies
+:PROPERTIES:
+:CUSTOM_ID: -dependencies
+:END:
 
 ** Core
+:PROPERTIES:
+:CUSTOM_ID: core
+:END:
 + [[https://github.com/Aylur/ags][ags]] (v3+) — GTK4 shell framework
 + libastal-4-git 
 + libastal-apps-git 
@@ -66,6 +124,9 @@ Features a *mutual exclusion* system — only one OSD is visible at a time, with
 + nvidia/nvidia-smi
 
 ** System Tools
+:PROPERTIES:
+:CUSTOM_ID: system-tools
+:END:
 - =hyprland= — Wayland compositor
 - =wireplumber= — audio session manager
 - =sassc= — SCSS compiler (for hot-reload)
@@ -76,14 +137,23 @@ Features a *mutual exclusion* system — only one OSD is visible at a time, with
 - =python-libevdev= — keyboard LED monitoring
 
 * 🚀 Installation
+:PROPERTIES:
+:CUSTOM_ID: -installation
+:END:
 
 ** 1. Clone the repository
+:PROPERTIES:
+:CUSTOM_ID: 1-clone-the-repository
+:END:
 #+begin_src bash
-git clone https://github.com/berlizoves/ags-bar ~/.config/ags
+git clone https://github.com/XenHunt/ags-config ~/.config/ags
 cd ~/.config/ags
 #+end_src
 
 ** 2. Install dependencies (Arch Linux)
+:PROPERTIES:
+:CUSTOM_ID: 2-install-dependencies-arch-linux
+:END:
 #+begin_src bash
 # Core
 yay -S ags libastal libastal-battery libastal-hyprland \
@@ -95,18 +165,27 @@ sudo pacman -S sassc jq brightnessctl lm_sensors python-libevdev
 #+end_src
 
 ** 3. Setup permissions for keyboard LED monitoring
+:PROPERTIES:
+:CUSTOM_ID: 3-setup-permissions-for-keyboard-led-monitoring
+:END:
 #+begin_src bash
 sudo usermod -a -G input $USER
 # Log out and log back in for this to take effect
 #+end_src
 
 ** 4. Copy scripts
+:PROPERTIES:
+:CUSTOM_ID: 4-copy-scripts
+:END:
 #+begin_src bash
 chmod +x ~/.config/ags/scripts/*.sh
 chmod +x ~/.config/ags/scripts/*.py
 #+end_src
 
 ** 5. Configure Hyprland keybindings
+:PROPERTIES:
+:CUSTOM_ID: 5-configure-hyprland-keybindings
+:END:
 Add to your =hyprland.conf=:
 #+begin_src lua
 hl.bind(
@@ -164,11 +243,17 @@ hl.bind(
 #+end_src
 
 ** 6. Run
+:PROPERTIES:
+:CUSTOM_ID: 6-run
+:END:
 #+begin_src bash
 ags run --gtk 4
 #+end_src
 
 * 📁 Project Structure
+:PROPERTIES:
+:CUSTOM_ID: -project-structure
+:END:
 
 #+begin_src
 .
@@ -214,8 +299,14 @@ ags run --gtk 4
 #+end_src
 
 * 🎨 Customization
+:PROPERTIES:
+:CUSTOM_ID: -customization
+:END:
 
 ** Styling
+:PROPERTIES:
+:CUSTOM_ID: styling
+:END:
 Edit =style.scss= — changes are applied automatically on save.
 
 SCSS variables you can tweak:
@@ -226,12 +317,18 @@ $active: #89b4fa;
 #+end_src
 
 ** Adding widgets
+:PROPERTIES:
+:CUSTOM_ID: adding-widgets
+:END:
 All widgets are in =widget/= directory. To add a new one:
 1. Create =widget/MyWidget.tsx=
 2. Import it in =widget/Bar.tsx=
 3. Add to the desired section (start / center / end)
 
 ** IPC Commands
+:PROPERTIES:
+:CUSTOM_ID: ipc-commands
+:END:
 Control the bar from CLI:
 #+begin_src bash
 # Show specific OSD
@@ -244,12 +341,18 @@ ags request -i my-bar led capslock on
 #+end_src
 
 * 🙏 Acknowledgments
+:PROPERTIES:
+:CUSTOM_ID: -acknowledgments
+:END:
 
 - *[[https://github.com/Aylur][Aylur]]* — for creating AGS and Astal, the backbone of this project
 - *[[https://github.com/ignis-sh/ignis][Ignis]]* — the original framework this config was ported from
 - *[[https://hyprland.org/][Hyprland]]* community — for the best Wayland compositor
 
 * 📄 License
+:PROPERTIES:
+:CUSTOM_ID: -license
+:END:
 
 This project is licensed under the MIT License — see the [[./LICENSE][LICENSE]] file for details.
 
